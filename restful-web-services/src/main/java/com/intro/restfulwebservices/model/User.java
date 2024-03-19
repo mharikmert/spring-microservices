@@ -1,7 +1,6 @@
 package com.intro.restfulwebservices.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 
@@ -22,7 +21,7 @@ public class User {
     private LocalDate birthDate;
 
     @OneToMany
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private List<Post> posts;
 
     public User () {}

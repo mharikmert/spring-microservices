@@ -1,5 +1,6 @@
 package com.intro.restfulwebservices.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -15,8 +16,9 @@ public class Post {
     private String content;
     private PostType type;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     public Long getId() {
@@ -39,6 +41,14 @@ public class Post {
         return type;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "Post{" +
@@ -50,4 +60,3 @@ public class Post {
                 '}';
     }
 }
-

@@ -2,7 +2,9 @@ package com.intro.restfulwebservices.controller;
 
 import com.intro.restfulwebservices.exception.UserNotFoundException;
 import com.intro.restfulwebservices.model.Post;
+import com.intro.restfulwebservices.model.PostType;
 import com.intro.restfulwebservices.model.User;
+import com.intro.restfulwebservices.service.PostService;
 import com.intro.restfulwebservices.service.UserService;
 
 import jakarta.validation.Valid;
@@ -21,9 +23,11 @@ public class UserController {
 
     private static final Logger logger = Logger.getLogger(UserController.class.getName());
     private final UserService userService;
+    private final PostService postService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, PostService postService) {
         this.userService = userService;
+        this.postService = postService;
     }
 
     @GetMapping
@@ -42,14 +46,14 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        User createduser = userService.createUser(user);
+        User createdUser = userService.createUser(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(createduser.getId())
+                .buildAndExpand(createdUser.getId())
                 .toUri();
 
-        logger.info("User created: " + createduser);
+        logger.info("User created: " + createdUser);
 
         return ResponseEntity.created(location).build();
     }
@@ -71,6 +75,29 @@ public class UserController {
         if (user.isEmpty()) {
             throw new UserNotFoundException("User not found with id: " + id);
         }
-        return ResponseEntity.ok(user.get().getPosts());
+        return ResponseEntity.ok(postService.getPostsByUserId(id));
+    }
+
+    @PostMapping(path = "/{id}/posts")
+    public ResponseEntity<Post> createUserPost(@PathVariable Long id, @RequestBody Post post) {
+
+        Optional<User> user = Optional.ofNullable(userService.getUserById(id));
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User not found with id: " + id);
+        }
+
+        post.setUser(user.get());
+
+        Post createdPost = postService.createPost(post);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdPost.getId())
+                .toUri();
+
+        logger.info("Post created: " + createdPost);
+
+        return ResponseEntity.created(location).build();
     }
 }
