@@ -1,6 +1,5 @@
 package org.services.limits.configuration;
 
-import org.services.limits.model.Limits;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
